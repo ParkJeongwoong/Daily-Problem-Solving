@@ -30,7 +30,7 @@ def main():
             i //= 2
         if tmp_sum == S:
             answer += 1
-    
+
     print(answer)
 
 if __name__ == "__main__":
