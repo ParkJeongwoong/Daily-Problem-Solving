@@ -1,0 +1,76 @@
+# 221012 PRG 42891 (Heap)
+
+링크 : https://school.programmers.co.kr/learn/courses/30/lessons/42891
+
+제목 : 무지의 먹방 라이브
+
+유형 : Heap
+
+---
+
+리스트를 사용해서 푼 코드는 다음과 같다.
+
+```python
+def solution(food_times, k):
+    next_food = [i+1 for i in range(len(food_times))]
+    from_food = [i-1 for i in range(len(food_times))]
+    next_food[-1] = 0
+    from_food[0] = len(food_times)-1
+    
+    i = 0
+    while k:
+        food_times[i] -= 1
+        if not food_times[i]:
+            next_food[from_food[i]] = next_food[i]
+            from_food[next_food[i]] = from_food[i]
+        i = next_food[i]
+        k -= 1
+        if not food_times[i]:
+            return -1
+        
+    answer = i+1
+    return answer
+```
+
+이 코드는 정확성 테스트는 통과했지만 효율성 테스트는 통과하지 못했다.
+
+
+
+효율성 테스트를 통과하기 위해선 Heap을 사용해야 한다.
+
+```python
+import heapq
+
+def solution(food_times, k):
+    heap = [(food_times[i],i) for i in range(len(food_times))]
+    heapq.heapify(heap)
+    popped = []
+    eaten = 0
+    
+    while heap:
+        if k >= (heap[0][0]-eaten) * len(heap):
+            k -= (heap[0][0]-eaten) * len(heap)
+            eaten, popped_food = heapq.heappop(heap)
+            heapq.heappush(popped, popped_food)
+        else:
+            answer = k%len(heap)
+            while popped:
+                if answer >= heapq.heappop(popped):
+                    answer = answer+1
+            return answer+1
+    return -1
+```
+
+방법은 다음과 같다.
+
+1. 시간이 넉넉하면 -1
+
+2. (음식, 번호)의 최소 힙을 생성
+
+3. 시간 안에 최소 힙의 0번째 음식을 다 먹을 수 있는지 확인
+   
+   - (0번째 음식의 남은 시간)  * (음식 종류) = (0번째 음식의 시간 - 지금까지 0번째 음식을 먹은 시간) * (음식 종류)
+
+4- 다 먹을 수 있으면 heappop & k 재갱신
+
+5- 다 먹을 수 없으면 다음에 먹을 음식 찾기
