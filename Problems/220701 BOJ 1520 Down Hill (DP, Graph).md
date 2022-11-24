@@ -12,7 +12,6 @@
 
 ```python
 import sys
-import heapq
 input = sys.stdin.readline
 sys.setrecursionlimit(10**6)
 
